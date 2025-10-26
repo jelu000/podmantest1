@@ -1,0 +1,145 @@
+OBS installer inte podman via snap pga konflikter
+
+sudo apt install podman
+sudo apt install podman-compose
+
+sudo apt install python3-pip
+pip3 --version
+pip install podman-compose --user
+
+
+podman-compose up -d  Slår på alla container som deamom
+podman-compose down  Slår av alla containrar container  
+podman ps Visar kontainrar som körs
+podman ps -a visar alla containrar även de som ej körs
+podman images visar images
+podman rmi 706db57fb206  tar bort image
+
+podman pull docker.io/library/php:8.3-apache
+podman pull docker.io/library/mariadb:10.6
+podman pull docker.io/library/node:20
+
+ npm create react-app att_gora
+
+Antares fält	Värde	Baseras på docker-compose.yml
+User Name	root	Standard för MariaDB/MySQL.
+Password	myrootpassword	Värdet från MYSQL_ROOT_PASSWORD
+Database	myapp_db	Värdet från MYSQL_DATABASE (kan lämnas tomt först)
+
+
+
+
+git
+------------
+tips: Använder ”master” som namn för den inledande grenen. Detta förvalda grennamn
+tips: kan ändras i framtiden. För att välja vilket namn som ska användas på
+tips: den inledande grenen i alla nya arkiv, och dölja denna varning, kör du:
+tips: 
+tips:   git config --global init.defaultBranch <namn>
+tips: 
+tips: Namn som ofta används istället för ”master” är ”main”, ”trunk” och
+tips: ”development”. Den nyskapade grenen kan ges nytt namn med kommandot:
+tips: 
+tips:   git branch -m <namn>
+
+
+frontend react
+---------------------------
+Sammanfattning och Förbättring
+Är det fel? Nej, det är korrekt och förmodligen nödvändigt för din containeriserade utvecklingsmiljö.
+
+Förbättring: Även om HOST fungerar utan prefix, tänk på att alla andra variabler du vill använda i din kod (t.ex. din PHP API-URL) måste ha prefixet.
+
+Exempel på en komplett .env i din frontend/ mapp:
+
+Kodavsnitt
+
+# Används av utvecklingsservern (inget prefix behövs)
+HOST=0.0.0.0 
+PORT=3000
+
+# Detta MÅSTE ha prefixet för att du ska kunna använda det i koden:
+REACT_APP_API_URL=http://localhost:80/api.php
+Sedan kan du använda den i din React-kod så här:
+
+JavaScript
+
+// I AddTodo.js eller App.js
+const API_URL = process.env.REACT_APP_API_URL; // http://localhost:80/api.php
+
+
+
+problem med snap
+--------------------------------
+sudo snap remove podman
+podman system reset
+podman rm -fa
+sudo apt install podman containernetworking-plugins
+sudo rm -rf ~/snap/code/210
+rm -rf ~/snap/code/210
+
+
+
+Åh, det förklarar allt! Det är en klassisk PATH-konflikt relaterad till VS Code och Snap.
+
+Analys av problemet
+När du kör kommandot i:
+
+Ubuntus egna terminal (GNOME Terminal/Konsole): 
+Den laddar din vanliga användarmiljö och din PATH pekar korrekt på den stabila APT-versionen av Podman (/usr/bin/podman).
+
+VS Code-terminalen: VS Code (särskilt om det är installerat som ett Snap-paket, 
+vilket är standard på Ubuntu) kan tvinga miljön att använda Snap-specifika binärer eller PATH-inställningar. 
+Den ser den gamla, korrupta Snap-konfigurationen, försöker använda den, och får då felet: 
+Error: database static dir "" does not match our static dir "/home/jens/snap/code/211/.local/share/containers/storage/libpod"
+: database configuration mismatch.
+
+Lösning: Tvinga VS Code att använda rätt PATH
+Det finns två huvudstrategier för att lösa detta permanent i VS Code:
+
+1. Ändra VS Code's standardmiljö (Rekommenderat)
+Du kan instruera VS Code att ignorera alla konstiga Snap-miljöer och bara använda den rena, korrekta PATH:en.
+
+Öppna VS Code.
+
+Gå till Settings (File > Preferences > Settings, eller tryck Ctrl + ,).
+
+Sök efter terminal.integrated.inheritEnv
+
+Ställ in "Terminal > Integrated: Inherit Env" till true. (Detta är oftast standard, men se till att den inte är false).
+
+Sök efter terminal.integrated.env.linux (eller windows om du kör WSL2).
+
+Om du ser några explicita miljövariabler definierade här som pekar på Snap-kataloger (/snap/bin, etc.), ta bort dem.
+
+2. Installera VS Code utanför Snap (Bästa långsiktiga lösningen)
+Om du har VS Code installerat som ett Snap-paket (snap install code), är det den enklaste källan till dina PATH-problem. Många utvecklare på Ubuntu väljer att installera VS Code direkt från Microsofts egna APT-repository för en stabilare upplevelse.
+
+Steg för att byta till APT-versionen av VS Code:
+
+Spara dina inställningar! (VS Code synkroniserar detta via ditt Microsoft-konto, men det är bra att vara säker).
+
+Ta bort Snap-versionen av VS Code:
+
+Bash
+
+sudo snap remove code
+Lägg till Microsofts GPG-nyckel:
+
+Bash
+
+wget -qO- https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > packages.microsoft.gpg
+sudo install -o root -g root -m 644 packages.microsoft.gpg /etc/apt/trusted.gpg.d/
+Lägg till VS Code-repositoryt:
+
+Bash
+
+sudo sh -c 'echo "deb [arch=amd64,arm64,armhf] https://packages.microsoft.com/repos/code stable main" > /etc/apt/sources.list.d/vscode.list'
+rm -f packages.microsoft.gpg
+Installera APT-versionen av VS Code:
+
+Bash
+
+sudo apt update
+sudo apt install code
+Efter detta kör VS Code i en mycket renare miljö, och dess inbyggda terminal kommer med stor sannolikhet att ärva den korrekta APT-baserade PATH-inställningen från ditt operativsystem. Detta bör permanent eliminera felet.

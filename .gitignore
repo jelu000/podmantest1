@@ -1,0 +1,45 @@
+# ----------------------------------------
+# Generella OS- och Editor-filer
+# ----------------------------------------
+#.DS_Store
+#.vscode/
+
+# ----------------------------------------
+# 1. Frontend (React)
+# ----------------------------------------
+
+# Node modules: Alla installerade bibliotek. Återskapas med npm install.
+#/frontend/node_modules
+# Tarbort alla mappar som heter node_modules
+node_modules
+
+# Byggkatalog: Genereras när appen byggs för produktion.
+/frontend/app/build
+/frontend/app/dist
+
+# Loggfiler och Cache
+/frontend/app/.cache
+/frontend/app/*.log
+/frontend/app/npm-debug.log*
+
+# Tester och Covereage (Om du kör tester)
+/frontend/app/coverage
+
+# ----------------------------------------
+# 2. Backend (PHP)
+# ----------------------------------------
+
+# Composer-beroenden. Återskapas med composer install.
+/backend/vendor/
+
+# Miljövariabler (Innehåller hemligheter)
+.env
+# Om du har en DB-konfigurationsfil i backend
+/backend/config.php
+
+# ----------------------------------------
+# 3. Databas/Podman
+# ----------------------------------------
+
+# Volymer/Data: MariaDB:s faktiska databasfiler. Får ALDRIG inkluderas.
+/db/data/

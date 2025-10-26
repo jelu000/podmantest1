@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # 1. FRONTEND: React utvecklingsserver (ENDAST LOKAL ANVÄNDNING)
+  frontend:
+    #image: node:20
+    image: docker.io/library/node:20
+    volumes:
+      #- ./frontend:/app
+      - ./frontend/app:/app  # Mappar 'app' mappen till '/app' i containern
+    command: npm start #run dev
+    working_dir: /app
+    ports:
+      # >>> 2. ÄNDRA PORTMAPPNINGEN TILL 3000:3000
+      # CRA:s standardutvecklingsport är 3000, så vi mappar den till värdsystemets port 3000
+      - "3000:3000" # React/Vite dev server
+    networks:
+      - app-network
+
+  # 2. DATABASE: MariaDB
+  db:
+    #image: mariadb:10.6
+    image: docker.io/library/mariadb:10.6
+    container_name: mariadb_db
+    ports:
+    - "3306:3306" # Värdport (dator) : Containerport (MariaDB)
+    environment:
+      MYSQL_ROOT_PASSWORD: myrootpassword
+      MYSQL_DATABASE: myapp_db
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - app-network
+
+  # 3. PHP-BACKEND: Apache (med PHP)
+  # Använder en officiell Apache/PHP-bild för att efterlikna LAMP-stacken
+  apache:
+    #image: php:8.3-apache # Bild med Apache och PHP förinstallerat
+    image: docker.io/library/php:8.3-apache
+    container_name: apache_server
+    ports:
+      #- "80:80" # Standard HTTP-port
+      # Ändra till Värdport:Containerport (8080:80)
+      - "8080:80" # Standard HTTP-port
+    volumes:
+      # Mappa din backend-kod som rotdokument (/var/www/html)
+      - ./backend:/var/www/html
+      # Mappa din anpassade Apache-konfiguration
+      - ./apache/vhost.conf:/etc/apache2/sites-enabled/000-default.conf:ro
+      # (VALFRITT) Aktivera .htaccess-filer
+      - ./apache/rewrite.load:/etc/apache2/mods-enabled/rewrite.load
+    networks:
+      - app-network
+    depends_on:
+      - db
+
+# Volymer och Nätverk
+volumes:
+  db_data:
+networks:
+  app-network:
+    driver: bridge
