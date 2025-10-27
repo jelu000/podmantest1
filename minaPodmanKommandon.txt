@@ -1,4 +1,5 @@
 OBS installer inte podman via snap pga konflikter
+OBS Går att starta poden från Ubuntus egen terminal men inte VS code terminalen
 
 sudo apt install podman
 sudo apt install podman-compose
@@ -41,6 +42,8 @@ tips: Namn som ofta används istället för ”master” är ”main”, ”trun
 tips: ”development”. Den nyskapade grenen kan ges nytt namn med kommandot:
 tips: 
 tips:   git branch -m <namn>
+
+Fler tips
 
 
 frontend react
