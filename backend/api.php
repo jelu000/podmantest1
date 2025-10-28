@@ -1,10 +1,28 @@
 <?
+// 1. Tillåt åtkomst från din React-domän (http://localhost:3000)
+header('Access-Control-Allow-Origin: http://localhost:3000');
+
+// 2. Tillåt de HTTP-metoder som din app använder (GET, POST, DELETE)
+header('Access-Control-Allow-Methods: GET, POST, DELETE, OPTIONS');
+
+// 3. Tillåt de headers som React och Axios skickar (t.ex. Content-Type)
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+// 4. Hantera OPTION-förfrågningar (Pre-flight request)
+// Webbläsaren skickar först en OPTIONS-förfrågan för POST/DELETE
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
 // PHP-fil för att testa databasanslutningen
 
 $host = 'mariadb_db'; // Måste matcha containerns namn i docker-compose
 $db   = 'myapp_db';
 $user = 'root';
 $pass = 'myrootpassword'; // Måste matcha lösenordet i docker-compose
+
+echo "Hej";
 
 //$dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
 /**$options = [
@@ -24,19 +42,19 @@ $pass = 'myrootpassword'; // Måste matcha lösenordet i docker-compose
 
      //function connect(){
          
-        try {
-            $conn = new PDO('mysql:host=' .$host .';dbname=' .$db, $user, $pass);
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            echo "CONNECT db";
+        // try {
+        //     $conn = new PDO('mysql:host=' .$host .';dbname=' .$db, $user, $pass);
+        //     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        //     echo "CONNECT db";
 
-            return $conn;
-        }
-        catch (Exception $e){
-            echo "Database error: " . $e->getMessage() ; 
-        }
-        catch (PDOException $e){
-            echo "Database PDO error: " . $e->getMessage() ; 
-        }
+        //     return $conn;
+        // }
+        // catch (Exception $e){
+        //     echo "Database error: " . $e->getMessage() ; 
+        // }
+        // catch (PDOException $e){
+        //     echo "Database PDO error: " . $e->getMessage() ; 
+        // }
      
  //}
 
