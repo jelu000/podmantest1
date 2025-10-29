@@ -3,10 +3,16 @@ import axios from 'axios';
 // Hämta API-URL från miljövariablerna
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080/api.php';
 
+// Gå till http://localhost:8080/api.php?action=markCompleted&id=5
+// const taskId = 5;
+// const apiUrl = `http://localhost:8080/api.php?action=markCompleted&id=${taskId}`;
+
 // Exportfunktion för att Hämta alla uppgifter (READ)
 export const fetchTodos = async () => {
     try {
-        const response = await axios.get(API_URL);
+        console.log("Hej")
+        let req = `${API_URL}?action=addTodo`
+        const response = await axios.get(req);
         return response.data; // Returnera listan med uppgifter
     } catch (error) {
         console.error("Fel vid hämtning av uppgifter:", error);
