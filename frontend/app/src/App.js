@@ -1,46 +1,67 @@
-import React, { useState, useEffect } from 'react'
+//import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react';
 import ListTodos from './ListTodos';
 import AddTodo from './AddTodo';
-import TodoApi, { fetchTodos } from './TodoApi';
-//import TodoApi from './TodoApi';
+import TodoApi, { addTodos, fetchTodos } from './TodoApi';
 
 import './App.css';
 
 function App() {
 
-  //1. STATE för att lagra listan med uppgifter
+ 
   const [tasks, setTasks] = useState([]);
-    
-  // 2. STATE för att hantera laddningsstatus
   const [isLoading, setIsLoading] = useState(true);
 
-  // Funktion för att hämta data
-    // const loadTasks = async () => {
-    //     setIsLoading(true);
-    //     try {
-            
-    //         const data = await fetchTodos();
-    //         setTasks(data); 
-    //     } catch (error) {
-    //         console.error("Kunde inte hämta uppgifter:", error);
-            
-    //     } finally {
-    //         setIsLoading(false); 
-    //     }
+  // 1. ANVÄND useCallback för att skapa en stabil hämtningsfunktion
+  const loadTasks = useCallback(async () => {
+      setIsLoading(true);
+      try {
+          // Gör anropet till din API-modul
+          const data = await fetchTodos(); // Await löser Promise till data
+          setTasks(data); 
+      } catch (error) {
+          console.error("Kunde inte hämta uppgifter:", error);
+      } finally {
+          setIsLoading(false); 
+      }
+  }, []); // [] gör att funktionen bara skapas en gång
 
-        
-    // };
+  // 2. ANVÄND useEffect för att trigga funktionen vid sidladdning
+  useEffect(() => {
+    // Kör hämtningsfunktionen
+    loadTasks(); 
+    
+    // Den tomma arrayen [] gör att denna effekt endast körs efter FÖRSTA renderingen
+  }, [loadTasks]); // loadTasks är en dependency men tack vare useCallback är den stabil
+
+  // Om du vill hantera radering/lägg till här, definiera funktionerna:
+  const handleDelete = (id) => { 
+    /* ... anropa deleteTodo och uppdatera tasks ... */ 
+  
+  };
+  
+  // Hantera laddningsstatus
+  if (isLoading) {
+    return <div>Laddar uppgifter...</div>;
+  }
     
       // Gör anropet till din API-modul
-      const data = fetchTodos();
+      //const data = fetchTodos();
+      //console.log(data);
+      
+      
       //setTasks(data); // Spara den hämtade datan i state
+       addTodos("Mjölka kon");
 
   return (
     <div className="App">
       <header className="App-header">
         <h3>To Do</h3>
-        <AddTodo />
-        <ListTodos />
+        {/* Skicka ner loadTasks så att AddTodo kan be App.js ladda om listan */}
+        <AddTodo onNewTodoAdded={loadTasks} /> 
+        
+        {/* Skicka den hämtade listan till ListTodos */}
+        <ListTodos tasks={tasks} />
 
       </header>
     </div>
