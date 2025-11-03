@@ -47,9 +47,9 @@ export const addTodos = async (todotext) => {
 // Exportfunktion för att Radera en uppgift (DELETE)
 export const deleteTodo = async (id) => {
     try {
-        let req = `${API_URL}?action=delTodo`;
+        
         // Skicka DELETE-förfrågan (med ID i URL-parametern)
-        await axios.delete(`${API_URL}?id=${id}`);
+        const response = await axios.delete(`${API_URL}?id=${id}&action=deleteTodo`);
         // Returnera ingenting, eller true, vid lyckad operation
         return true; 
     } catch (error) {

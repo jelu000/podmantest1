@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import ListTodos from './ListTodos';
 import AddTodo from './AddTodo';
-import TodoApi, { addTodos, fetchTodos } from './TodoApi';
+import TodoApi, { addTodos, fetchTodos, deleteTodo } from './TodoApi';
 
 import './App.css';
 
@@ -51,7 +51,7 @@ function App() {
       
       
       //setTasks(data); // Spara den hämtade datan i state
-       addTodos("Mjölka kon");
+       addTodos("2334")
 
   return (
     <div className="App">

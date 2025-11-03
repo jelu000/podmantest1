@@ -29,9 +29,9 @@ $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
-    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Kastar undantag vid fel
-    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Standardformat för data blir associativ array
-    PDO::ATTR_EMULATE_PREPARES   => false,                  // Använd riktiga prepared statements
+     PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION, // Kastar undantag vid fel
+     PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,       // Standardformat för data blir associativ array
+     PDO::ATTR_EMULATE_PREPARES   => false,                  // Använd riktiga prepared statements
 ];
 
 
@@ -45,39 +45,33 @@ try {
           $action = $_GET['action'];
 
           if ($action === 'getTodos') {
-               //getTodos($dsn, $user, $pass, $options);
-               // SQL-fråga för att hämta alla uppgifter
-               //$sql = "SELECT * FROM tasks ORDER BY id DESC";
-
-               // Kör frågan
-               //$stmt = $pdo->query($sql);
-
-               // Hämta alla resultat som en associativ array
-               //$tasks = $stmt->fetchAll();
-
-               // Returnera uppgifterna som ett JSON-svar
-               //echo json_encode(['success' => true, 'data' => $tasks]);
-               //exit();
-          }
+               getTodos($dsn, $user, $pass, $options);
+          } 
           
-          if ($action === 'delTodo'){
-               //delTodo($dsn, $user, $pass, $options, $t_id);
-               echo "delTodo";
-          }
-     }
-     else if (isset($_POST['action'])) {
-          $action = $_POST['action'];
+     } 
 
-          if ($action === 'addTodo'){
-
-               //addTodo($dsn, $user, $pass, $options, $todo_mess);
-               echo "addTodo";
-          }
-      }
-
+     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+          
+          // Läs in JSON-datan från kroppen
+           if (isset($_GET['action'])){
+               $data = json_decode(file_get_contents("php://input"), true);
+               $title = $data['todotext'];
+          
+               echo $title;
+           }      
+     } 
+     
+     if ($_SERVER['REQUEST_METHOD'] === 'DELETE'){ // && isset($_GET['action']) && $_GET['action'] === 'deleteTodo') {
+         if (isset($_GET['id'])){
+          $t_id = $_GET['id'];
+          echo $t_id;
+         }         
+     } 
+     
+     
      // Om ingen giltig åtgärd angavs
      echo json_encode(['success' => false, 'message' => 'Ogiltig eller saknad åtgärd.']);
-
+     
 } catch (\PDOException $e) {
      // Hantera fel vid databasanslutning eller SQL-fråga
      http_response_code(500); // Internal Server Error
@@ -88,17 +82,18 @@ try {
           'error_details' => $e->getMessage()
      ]);
 } catch (\Exception $e) {
-    // Hantera andra oväntade fel
-    http_response_code(500);
-    echo json_encode([
-         'success' => false,
-         'message' => 'Ett oväntat fel inträffade.'
-    ]);
+     // Hantera andra oväntade fel
+     http_response_code(500);
+     echo json_encode([
+          'success' => false,
+          'message' => 'Ett oväntat fel inträffade.'
+     ]);
 }
 
-function getTodos($dsn, $user, $pass, $options){
+function getTodos($dsn, $user, $pass, $options)
+{
      $pdo = new PDO($dsn, $user, $pass, $options);
-       
+
      // SQL-fråga för att hämta alla uppgifter
      $sql = "SELECT * FROM tasks ORDER BY id DESC";
 
@@ -113,16 +108,34 @@ function getTodos($dsn, $user, $pass, $options){
      exit();
 }
 
-function delTodo($dsn, $user, $pass, $options, $t_id){
+function delTodo($dsn, $user, $pass, $options, $t_id)
+{
      $pdo = new PDO($dsn, $user, $pass, $options);
-       
-     // SQL-fråga för att hämta alla uppgifter
-     $sql = "SELECT * FROM tasks ORDER BY id DESC";
+     $sql = "DELETE FROM todos WHERE id = :id";
 
+     try {
+        $stmt = $pdo->prepare($sql);
+        
+        // 3. Bind ID:t som en integer
+        $stmt->bindParam(':id', $t_id, PDO::PARAM_INT);
+        
+        // 4. Utför satsen
+        $stmt->execute();
 
+        // 5. Skicka tillbaka en framgångsrespons (200 OK)
+        http_response_code(200);
+        echo json_encode(["success" => true, "message" => "Uppgift raderad framgångsrikt."]);
+
+    } catch (PDOException $e) {
+        error_log("Database error vid radering: " . $e->getMessage());
+        http_response_code(500); // Internal Server Error
+        echo json_encode(["message" => "Kunde inte radera uppgiften på grund av ett serverfel."]);
+    }
+    exit;
 }
 
-function addTodo($dsn, $user, $pass, $options, $t_todo){
+function addTodo($dsn, $user, $pass, $options, $t_todo)
+{
      $pdo = new PDO($dsn, $user, $pass, $options);
      $sql = "INSERT INTO tasks (title, completed) VALUES (:description, 0)";
      $stmt = $pdo->prepare($sql);
@@ -131,21 +144,4 @@ function addTodo($dsn, $user, $pass, $options, $t_todo){
      // Returnera det nya ID:t och framgång
      $newId = $pdo->lastInsertId();
      echo json_encode(['success' => true, 'id' => $newId, 'message' => 'Uppgift tillagd.']);
-
 }
-
-
-?>
-
-
-
-
-
-
-
-
-
-
-
-
-
