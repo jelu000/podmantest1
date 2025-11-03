@@ -8,6 +8,7 @@ sudo apt install python3-pip
 pip3 --version
 pip install podman-compose --user
 
+podman-compose up -d --build Bygger och slår på alla containrar
 
 podman-compose up -d  Slår på alla container som deamom
 podman-compose down  Slår av alla containrar container  
@@ -145,4 +146,62 @@ Bash
 
 sudo apt update
 sudo apt install code
-Efter detta kör VS Code i en mycket renare miljö, och dess inbyggda terminal kommer med stor sannolikhet att ärva den korrekta APT-baserade PATH-inställningen från ditt operativsystem. Detta bör permanent eliminera felet.
+
+Efter detta kör VS Code i en mycket renare miljö, och dess inbyggda terminal kommer med stor sannolikhet att ärva den korrekta APT-baserade 
+PATH-inställningen från ditt operativsystem. Detta bör permanent eliminera felet.
+
+
+----Fick lägga till driver för MySql till apache och php----------------------------------------------------------
+
+Aha! Felet could not find driver är ett klassiskt tecken på att din PHP-installation (inuti din Podman-container) inte har de 
+nödvändiga drivrutinerna för att prata med din MariaDB/MySQL-databas.
+
+Felet har ingenting att göra med din PHP-kod eller din SQL-sträng, utan handlar om de bibliotek som är installerade i din container.
+
+🛑 Problemet: PDO MySQL-drivrutinen saknas
+Den officiella PHP-bilden (php:8.3-apache) kommer som standard utan PDO MySQL-drivrutinen (pdo_mysql). Den måste installeras och aktiveras.
+
+✅ Lösningen: Skapa en anpassad Dockerfile
+För att lösa detta permanent måste vi bygga en egen Apache/PHP-image som inkluderar MariaDB/MySQL-drivrutinen. 
+Detta görs genom att lägga till en Dockerfile i din backend-mapp.
+
+Steg 1: Skapa backend/Dockerfile
+Skapa en ny fil i din backend-mapp med namnet Dockerfile och lägg till följande innehåll:
+
+Dockerfile
+
+# backend/Dockerfile
+
+# Börja från den officiella PHP-bilden du använder
+FROM docker.io/library/php:8.3-apache
+
+# Installera mysqli och pdo_mysql (PDO driver)
+RUN docker-php-ext-install mysqli pdo_mysql
+Steg 2: Uppdatera podman-compose.yml
+Du måste nu instruera podman-compose att bygga din nya, anpassade image istället för att bara ladda ner den officiella.
+
+Ändra apache-servicen i din podman-compose.yml:
+
+YAML
+
+# Ändra detta i din podman-compose.yml
+  # 3. PHP-BACKEND: Apache (med PHP)
+  apache:
+    # image: docker.io/library/php:8.3-apache  # <--- TA BORT ELLER KOMMENTERA BORT DENNA LINJE
+    build:
+      context: ./backend  # <-- LÄGG TILL: Säger åt compose att titta i ./backend efter en Dockerfile
+      dockerfile: Dockerfile
+    container_name: apache_server
+    # ... resten av konfigurationen (ports, volumes, networks) ...
+Steg 3: Bygg om och Starta Stacken
+Nu måste du bygga den nya bilden och starta om hela miljön:
+
+Bash
+
+# Gå till rotkatalogen för ditt projekt
+podman-compose down
+
+# Lägg till --build för att Podman ska bygga den nya bilden
+podman-compose up -d --build 
+När podman-compose körs kommer den att se din Dockerfile, installera pdo_mysql-drivrutinen i containern, 
+och först då kommer din PHP-kod att kunna ansluta till databasen. Felet could not find driver ska då vara löst!

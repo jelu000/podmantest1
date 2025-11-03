@@ -41,7 +41,15 @@ services:
   # Använder en officiell Apache/PHP-bild för att efterlikna LAMP-stacken
   apache:
     #image: php:8.3-apache # Bild med Apache och PHP förinstallerat
-    image: docker.io/library/php:8.3-apache
+    #image: docker.io/library/php:8.3-apache
+    
+    # image: docker.io/library/php:8.3-apache  # <--- TA BORT ELLER KOMMENTERA BORT DENNA LINJE
+    build:
+      context: ./backend  # <-- LÄGG TILL: Säger åt compose att titta i ./backend efter en Dockerfile
+      dockerfile: Dockerfile
+    container_name: apache_server
+    # ... resten av konfigurationen (ports, volumes, networks) ...
+
     container_name: apache_server
     ports:
       #- "80:80" # Standard HTTP-port
