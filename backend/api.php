@@ -56,7 +56,7 @@ try {
            if (isset($_GET['action'])){
                $data = json_decode(file_get_contents("php://input"), true);
                $title = $data['todotext'];
-          
+               addTodo($dsn, $user, $pass, $options, $title);
                echo $title;
            }      
      } 
@@ -89,7 +89,8 @@ try {
           'message' => 'Ett oväntat fel inträffade.'
      ]);
 }
-
+//Funktioner för att hantera databasen
+//getTodos()------------------------------------------
 function getTodos($dsn, $user, $pass, $options)
 {
      $pdo = new PDO($dsn, $user, $pass, $options);
@@ -107,7 +108,7 @@ function getTodos($dsn, $user, $pass, $options)
      echo json_encode(['success' => true, 'data' => $tasks]);
      exit();
 }
-
+//delTodo()--------------------------------------------------
 function delTodo($dsn, $user, $pass, $options, $t_id)
 {
      $pdo = new PDO($dsn, $user, $pass, $options);
@@ -133,7 +134,7 @@ function delTodo($dsn, $user, $pass, $options, $t_id)
     }
     exit;
 }
-
+//addTodo()---------------------------------------------------------
 function addTodo($dsn, $user, $pass, $options, $t_todo)
 {
      $pdo = new PDO($dsn, $user, $pass, $options);

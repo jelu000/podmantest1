@@ -44,6 +44,19 @@ function App() {
   if (isLoading) {
     return <div>Laddar uppgifter...</div>;
   }
+
+  const handleAddTodo = async (title) => {
+    try {
+        // 1. Skicka den nya posten (vi ignorerar returvärdet)
+        await addTodos(title); 
+
+        // 2. KÖR loadTasks igen för att hämta HELA den uppdaterade listan från servern
+        await loadTasks(); // loadTasks uppdaterar setTasks inuti sig
+
+    } catch (error) {
+        console.error("Kunde inte lägga till uppgift:", error);
+    }
+};
     
       // Gör anropet till din API-modul
       //const data = fetchTodos();
@@ -51,14 +64,14 @@ function App() {
       
       
       //setTasks(data); // Spara den hämtade datan i state
-       addTodos("2334")
+      // addTodos("2334")
 
   return (
     <div className="App">
       <header className="App-header">
         <h3>To Do</h3>
         {/* Skicka ner loadTasks så att AddTodo kan be App.js ladda om listan */}
-        <AddTodo onNewTodoAdded={loadTasks} /> 
+        <AddTodo onAdd={handleAddTodo} /> 
         
         {/* Skicka den hämtade listan till ListTodos */}
         <ListTodos tasks={tasks} />
