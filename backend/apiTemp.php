@@ -1,6 +1,7 @@
 
-
 <?
+//Detta är en fil jag sparar exempel kod som inte används
+
 // 1. Tillåt åtkomst från din React-domän (http://localhost:3000)
 header('Access-Control-Allow-Origin: http://localhost:3000');
 

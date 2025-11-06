@@ -57,14 +57,23 @@ function App() {
         console.error("Kunde inte lägga till uppgift:", error);
     }
 };
-    
-      // Gör anropet till din API-modul
-      //const data = fetchTodos();
-      //console.log(data);
+  
+  const handleDeleteTodo = async (id_del_todo) =>{
+    try {
+        console.log(`DeletTodo id: ${id_del_todo}`);
+        
+        // 1. Id på ToDo som ska tas bort
+        await deleteTodo(id_del_todo);
+
+        // 2. KÖR loadTasks igen för att hämta HELA den uppdaterade listan från servern
+        await loadTasks(); // loadTasks uppdaterar setTasks inuti sig
+    }
+    catch (error){
+        console.error("Kunde inte ta bort post:", error);
+    }
+
+  }
       
-      
-      //setTasks(data); // Spara den hämtade datan i state
-      // addTodos("2334")
 
   return (
     <div className="App">
@@ -74,7 +83,7 @@ function App() {
         <AddTodo onAdd={handleAddTodo} /> 
         
         {/* Skicka den hämtade listan till ListTodos */}
-        <ListTodos tasks={tasks} />
+        <ListTodos tasks={tasks} onDelete={handleDeleteTodo} />
 
       </header>
     </div>

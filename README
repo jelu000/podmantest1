@@ -1,2 +1,3 @@
 I det här repot sätter jag upp en webb-utvecklingsmiljö med podman som fungerar ungefär dom docker men som passar bra till Linux och Ubuntu eftersom den är rotless.
-Miljön består av en LAMP stack och front end är en att göra lista i REACT. Projektet har som syfte att lära mig podman.
+Miljön består av en LAMP stack och front end är en att göra lista i REACT. 
+Projektet har som syfte att lära mig podman och är en enkel Todo lista där man kan lägga till och tabort saker man har att göra.

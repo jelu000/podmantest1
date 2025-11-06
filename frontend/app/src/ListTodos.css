@@ -1,0 +1,51 @@
+/* Stilar för huvudlistan */
+.todo-list {
+  list-style: none; /* Tar bort standardpunktlistans markörer */
+  padding: 0;
+  margin: 0;
+}
+
+/* Stilar för varje enskilt listelement (todo-raden) */
+.todo-list li {
+  display: flex; /* Aktiverar Flexbox för att hantera barnen (titel och knapp) */
+  justify-content: space-between; /* Skjuter isär barnen: titel till vänster, knapp till höger */
+  align-items: center; /* Centrerar barnen vertikalt i raden */
+  padding: 8px 0; /* Lite vertikal utfyllnad för bättre läsbarhet */
+  border-bottom: 1px solid #eee; /* En linje mellan raderna för tydlighet */
+}
+
+/* Sista elementet kan få en specialbehandling om man vill, t.ex. ingen bottenlinje */
+.todo-list li:last-child {
+  border-bottom: none;
+}
+
+/* Stilar för todo-titeln (vänster kolumn) */
+.todo_title {
+  /* Här kan du lägga till stilar för texten om det behövs, t.ex. font-size */
+  flex-grow: 1; /* Låter titeln ta upp all tillgänglig plats mellan start och knappen */
+  text-align: left; /* Säkerställer att texten är vänsterjusterad */
+  margin-right: 15px; /* Lite utrymme mellan titeln och knappen */
+}
+
+/* Stilar för "completed" uppgifter */
+.todo-list li.completed .todo_title {
+  text-decoration: line-through; /* Streckar över texten för slutförda uppgifter */
+  color: #888; /* Ändrar färg för slutförda uppgifter */
+}
+
+/* Stilar för delete-knappen (höger kolumn) */
+.delete-button {
+  /* Knappen behöver ingen speciell justering här, eftersom 'justify-content: space-between' och 'flex-grow: 1' på titeln placerar den automatiskt till höger. */
+  /* Lägg till dina vanliga knappstilar här (bakgrundsfärg, padding, border etc.) */
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  text-align: right; /* Knappens text är justerad inuti knappen (inte i kolumnen, men ofta önskvärt) */
+}
+
+.delete-button:hover {
+  background-color: #ff4d4d;
+}

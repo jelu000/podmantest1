@@ -1,0 +1,68 @@
+/* Stil för den yttre behållaren */
+.add_maindiv {
+  padding: 15px; /* Lite luft runt formuläret */
+  background-color: hwb(219 47% 5% / 0.788); /* Lätt bakgrundsfärg för att separera den från listan */
+  border-radius: 8px; /* Avrundade hörn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* En subtil skugga */
+  margin-bottom: 20px; /* Utrymme under formuläret */
+}
+
+/* Stil för själva formuläret */
+.todo_form {
+  display: flex; /* Använder Flexbox för att lägga elementen på en rad */
+  align-items: center; /* Centrerar elementen vertikalt */
+  gap: 10px; /* Utrymme mellan elementen i formuläret */
+}
+
+/* Stil för "Att göra:" texten */
+.todo_form > label {
+  /* Om du använder en <label> tagg istället för bara text. Annars behövs denna inte. */
+  font-weight: bold;
+}
+
+/* Stil för textfältet (input) */
+.todo_tf {
+  flex-grow: 1; /* Låter textfältet ta upp det mesta av utrymmet */
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  min-width: 150px; /* Säkerställer att fältet inte blir för litet */
+}
+
+.todo_tf:focus {
+  border-color: #007bff; /* Blå kant vid fokus */
+  outline: none; /* Tar bort standardfokus-ramen i webbläsaren */
+}
+
+/* Stil för lägg till-knappen */
+.todo_addbutt {
+  background-color: #007bff; /* En snygg blå färg */
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer; /* Indikerar att det är en klickbar knapp */
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.2s ease; /* Smidig övergång för hovring */
+  flex-shrink: 0; /* Hindrar knappen från att krympa */
+}
+
+.todo_addbutt:hover {
+  background-color: #0056b3; /* Mörkare blå vid hovring */
+}
+
+/* För att hantera <br /> taggen: */
+/* Eftersom du har en <br /> tagg i din HTML, måste vi korrigera layouten: */
+/* Denna lösning förutsätter att du tar bort <br /> från din JSX. */
+/* Om du måste behålla <br /> (vilket jag avråder från i en flex layout), 
+   kan du ställa in .todo_form till 'display: block;' och ta bort 'gap' och 'align-items',
+   men det kommer att placera knappen under input-fältet. */
+/* Bäst är att ändra din JSX till: */
+/*
+<form className='todo_form' onSubmit={this.handleSubmit}>
+    Att göra: <input className='todo_tf' type='text' placeholder="Ny ToDo-uppgift..." value={this.state.title} onChange={this.handleChange}></input>
+    <button className='todo_addbutt' type='submit'>Lägg till</button>
+</form>
+*/

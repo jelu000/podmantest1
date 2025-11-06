@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-
+import './AddTodo.css'
 export class AddTodo extends Component {
 
  
@@ -34,12 +34,12 @@ export class AddTodo extends Component {
 
   render() {
     return (
-      <div>
+      <div className='add_maindiv'>
 
-        <form onSubmit={this.handleSubmit}>
-          Att göra: <input type='text' placeholder="Ny ToDo-uppgift..." value={this.state.title} onChange={this.handleChange}></input>
+        <form className='todo_form' onSubmit={this.handleSubmit}>
+          Att göra: <input className='todo_tf'  type='text' placeholder="Ny ToDo-uppgift..." value={this.state.title} onChange={this.handleChange}></input>
           <br />
-          <button type='submit'>Lägg till</button>
+          <button className='todo_addbutt' type='submit'>Lägg till</button>
           
         </form>
 

@@ -1,4 +1,5 @@
-import React from 'react'
+//import React from 'react'
+import './ListTodos.css';
 
 function ListTodos({ tasks, onDelete }) {
 
@@ -10,8 +11,11 @@ function ListTodos({ tasks, onDelete }) {
     return <p>Inga uppgifter att visa. Lägg till en ny!</p>;
   }
 
+
+
   return (
     <div>
+      <br />
       <h5>Lista att göra</h5>
       <ul className="todo-list">
 
@@ -21,8 +25,8 @@ function ListTodos({ tasks, onDelete }) {
           // 3. Varje element som skapas i en loop MÅSTE ha en unik 'key' 
 
           <li key={task.id} className={task.completed ? 'completed' : ''}>
-            <span> {task.title} </span>
-            <button onClick={() => onDelete(task.id)} className="delete-button">Radera</button>
+            <span className='todo_title'> {task.title} </span>
+            <button className="delete-button" onClick={() => onDelete(task.id)}>Radera</button>
           </li>
 
         ))}

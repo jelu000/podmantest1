@@ -65,6 +65,7 @@ try {
          if (isset($_GET['id'])){
           $t_id = $_GET['id'];
           echo $t_id;
+          delTodo($dsn, $user, $pass, $options, $t_id);
          }         
      } 
      
@@ -112,7 +113,7 @@ function getTodos($dsn, $user, $pass, $options)
 function delTodo($dsn, $user, $pass, $options, $t_id)
 {
      $pdo = new PDO($dsn, $user, $pass, $options);
-     $sql = "DELETE FROM todos WHERE id = :id";
+     $sql = "DELETE FROM tasks WHERE id = :id";
 
      try {
         $stmt = $pdo->prepare($sql);
