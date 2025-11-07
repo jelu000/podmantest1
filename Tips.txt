@@ -1,0 +1,285 @@
+Compiled with problems:
+ERROR in ./src/TodoApi.js 3:0-26
+Module not found: Error: Can't resolve 'axios' in '/app/src'
+
+Detta är ett mycket vanligt och enkelt problem att lösa! Felet Module not found: Error: Can't resolve 'axios' betyder att din React-app försöker importera biblioteket axios, 
+men det är inte installerat i din frontend-miljö (d.v.s. inuti containern).
+
+Även om du kanske installerade axios på din lokala dator, behöver du installera det inuti containern eftersom din utvecklingsmiljö nu körs där.
+-----------------------------------------------------------
+
+Lösning: Installera Axios i Frontend-miljön
+Du måste se till att axios finns listat i din frontend/package.json och sedan köra installationen.
+
+Steg 1: Kontrollera package.json
+Gå till filen frontend/package.json på din värddator och se till att axios finns listat under dependencies:
+
+// frontend/package.json
+{
+  // ... annan konfiguration ...
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "axios": "^1.6.8",  <-- KONTROLLERA ATT DENNA FINNS
+    // ... fler beroenden ...
+  },
+  // ...
+}
+
+Om det saknas, kör detta på din värddator (i mappen frontend):
+
+BASH
+npm install axios
+
+-----------------------------------------------------------------------
+
+Steg 2: Kör Installationen i Containern
+När du använder Podman Compose för att starta din frontend-container, kopieras inte node_modules (eftersom du har den i din .gitignore).
+Du måste därför köra npm install inuti containern för att installera alla beroenden från package.json.
+
+Eftersom containern redan startat och misslyckats kan du antingen:
+
+_____________
+Alternativ A: Enklast (Kör kommandot manuellt)
+Starta terminalen på din värddator.
+
+Gå till projektets rotkatalog.
+
+Kör npm install i den redan startade containern:
+
+BASH
+# Kör kommandot npm install i containern "frontend"
+podman-compose exec frontend npm install
+
+(OBS: Om podman-compose inte fungerar kan du behöva använda docker-compose om du använder Docker, 
+eller det långa Podman-kommandot för att hitta container-ID:t.)
+
+_____________
+Alternativ B: Bästa praxis (Bygg in installationen i Compose)
+
+Ett renare sätt är att lägga till ett inledande installationssteg i din podman-compose.yml. 
+Detta garanterar att installationen alltid körs innan npm start.
+
+1. Ändra frontend-servicen i din podman-compose.yml FRÅN:
+
+YAML
+FRÅN:
+command: npm start
+
+TILL:
+command: sh -c "npm install && npm start"
+
+2. Starta om hela stacken:
+BASH
+podman-compose down
+podman-compose up -d --build
+
+Skulle du vilja att jag hjälper dig att köra installationskommandot i din Podman-miljö eller föredrar du att jag går igenom 
+hur du lägger till det i din podman-compose.yml?
+
+JAG: ska jag följa rådet: 271 packages are looking for funding
+
+  run `npm fund` for details
+
+Gemeni
+Nej, du ska inte följa rådet npm audit fix --force just nu.
+
+Dessa meddelanden är standardvarningar som dyker upp i nästan alla moderna React-projekt. De är viktiga, 
+men ditt fokus bör först vara att få din applikation att fungera med Podman, inte att uppdatera alla bibliotek.
+
+Här är en uppdelning av de två meddelandena och det korrekta sättet att hantera dem:
+--------------------------------------------------------------
+1. 271 packages are looking for funding
+
+Betydelse: Detta är inte en varning eller ett problem. 
+Det betyder bara att de utvecklare som skapat några av de öppna källkods-bibliotek du 
+använder har inkluderat information om hur man kan donera till deras arbete (funding).
+
+Åtgärd: Detta kan ignoreras helt. Det påverkar inte din kod eller din säkerhet.
+--------------------------------------------------------------
+2. 9 vulnerabilities (3 moderate, 6 high)
+
+Betydelse: Detta indikerar att vissa av de paket du använder (antingen direkt eller som beroenden till andra paket) 
+har identifierats med säkerhetshål.
+
+Råd: Du får två kommandon:
+
+    -npm audit fix: Försöker fixa sårbarheterna utan att införa "breaking changes" (ändringar som kan förstöra din kod).
+
+    -npm audit fix --force: Ignorerar "breaking changes" och uppdaterar alla paket till den senaste versionen, 
+    vilket har stor risk att bryta din applikation.
+
+__________________________________________________________________________
+! Råd för din nuvarande situation
+
+Eftersom du just nu kämpar med att få din React-app att kommunicera med ditt API (en funktionell utmaning):
+
+Ignorera detta tills din app fungerar. Att introducera stora paketuppdateringar nu skulle göra det svårare att veta om ett fel 
+beror på din kod eller en ny paketversion.
+
+Kör aldrig npm audit fix --force om du inte har en omfattande testsvit. Det riskerar nästan alltid att skapa nya fel.
+
+
+___________________________________________________________________________
+När din applikation väl fungerar kan du köra:
+
+Bash
+
+npm audit fix
+
+Om detta inte löser alla sårbarheter, bör du manuellt undersöka de återstående med npm audit och uppdatera paket ett i taget.
+
+Fokusera nu på att få din frontend-container att starta och kommunicera med PHP!
+
+--------------------------------------------------------------------------------------------------
+JAG: nu la den till dependencies axios i package.json
+
+Gemeni
+Utmärkt! Det var ett viktigt steg.
+
+Nu när axios är tillagt i din frontend/package.json, är nästa kritiska steg att se till att den faktiskt blir installerad inuti din Podman-container.
+
+Eftersom du använder podman-compose, finns det två sätt du kan säkerställa detta:
+_______________________
+1. Det enkla sättet (Manuell installation)
+Om din frontend-container redan körs och har mappat din frontend/ mapp korrekt:
+
+BASH
+# Gå till rotkatalogen för ditt projekt på din dator
+# Stoppa eventuellt den misslyckade containern
+podman-compose down
+
+# Starta upp containrarna igen
+podman-compose up -d
+
+# Kör installationskommandot inuti den körande frontend-containern
+podman-compose exec frontend npm install
+
+Efter npm install kommer containern att ha axios i sin node_modules-mapp, och utvecklingsservern (som kör npm start) 
+bör automatiskt starta om, eller så måste du starta om den manuellt.
+
+_________________
+2 Det robusta sättet (Automatiskt vid varje start) OBS!!! Det jag gjorde
+Om du vill att npm install ska köras varje gång du startar din stack, 
+för att säkerställa att du alltid har de senaste beroendena (bra när du byter dator eller klonar repot), ändrar du din podman-compose.yml.
+
+Ändra i podman-compose.yml:
+
+YAML
+# Ändra detta i din frontend-service:
+
+services:
+  frontend:
+    # ...
+    # Denna linje byter ut: command: npm start
+    command: sh -c "npm install && npm start"
+    # ...
+
+
+Efter denna ändring, kör:
+
+BASH
+
+podman-compose down
+podman-compose up -d
+
+När du har gjort detta bör felet om att modulen axios inte hittas vara borta, 
+och din App.js kan anropa dina todoApi.js-funktioner!
+
+
+
+
+--------------------------------------------------------------------------------------------------------------------------
+Installer React Date-picker
+
+Skulle vilja lära mig och lägga till en extern react component till mitt todo list projekt. 
+Hur gör man de och måste jag installera det i min package.json fil och lägga till den i min podman-compose.yml fil för att de ska fungera? 
+jag hade tänkt mig den component: https://daypicker.dev/
+
+Det är ett utmärkt sätt att lära sig hur React-ekosystemet fungerar! Att integrera externa komponenter som react-day-picker är standardpraxis.
+
+Här är stegen för hur du lägger till en extern React-komponent, och vad som krävs i din package.json och podman-compose.yml.
+_____________________________
+1. Måste jag installera i package.json?
+ABSOLUT, JA.
+
+Alla externa bibliotek som din React-kod använder måste listas i frontend/package.json. Det är så Node.js och npm vet vilka filer som ska laddas ner.
+
+🛠️ Steg 1: Installera biblioteket
+Du måste köra installationskommandot på din värddator i mappen där din React-apps package.json finns (troligen frontend/).
+
+Bash
+# Gå till din frontend-katalog först (t.ex. cd frontend)
+npm install react-day-picker date-fns
+
+-react-day-picker: Själva kalenderkomponenten.
+
+-date-fns: Ett populärt JavaScript-bibliotek för datumhantering som react-day-picker rekommenderar för att hantera datumobjekt.
+
+Detta steg kommer att uppdatera din frontend/package.json och frontend/package-lock.json.
+____________________________
+2. Måste jag lägga till i podman-compose.yml?
+NEJ, INTE NÖDVÄNDIGTVIS.
+
+Du behöver inte ändra din podman-compose.yml-fil för att lägga till biblioteket. Däremot måste du se till att din container kör npm install så att biblioteket är tillgängligt inuti containern.
+
+🛠️ Steg 2: Köra npm install i Containern
+Som vi har gjort tidigare (för Axios), måste du se till att react-day-picker och date-fns installeras i containerns node_modules-mapp.
+
+2.1. Stäng ner din Podman-stack:
+
+Bash
+podman-compose down
+
+
+2.2. Kör npm install (Automatiskt): Eftersom vi tidigare ändrade din podman-compose.yml till:
+
+YAML
+command: sh -c "npm install && npm start"
+
+Behöver du bara köra podman-compose up igen. Den kommer automatiskt att installera de nya beroendena från den uppdaterade package.json.
+
+Bash
+podman-compose up -d
+________________________________
+3. Implementera komponenten i React
+Nu när biblioteket är installerat kan du importera och använda det i en komponent, till exempel i din AddTodo.js för att välja ett deadline-datum.
+
+🛠️ Steg 3.3: Använda DayPicker (Exempel i AddTodo.js)
+Du skulle då behöva uppdatera din komponent (här som en funktionskomponent för enkelhetens skull, men klasser fungerar likadant) för att hantera datum:
+
+//JavaScript--------------------------
+// src/components/DeadlinePicker.js (ny komponent)
+
+import React, { useState } from 'react';
+import { DayPicker } from 'react-day-picker';
+import 'react-day-picker/dist/style.css'; // Glöm inte att importera CSS!
+
+function DeadlinePicker() {
+  const [selectedDay, setSelectedDay] = useState();
+
+  return (
+    <div>
+      <h4>Välj Deadline:</h4>
+      <DayPicker
+        mode="single" // Tillåter endast val av ett datum
+        selected={selectedDay}
+        onSelect={setSelectedDay}
+        // Lägg till andra props som t.ex. disabled (för att inte tillåta gamla datum)
+      />
+      {selectedDay && <p>Vald deadline: {selectedDay.toLocaleDateString()}</p>}
+    </div>
+  );
+}
+
+export default DeadlinePicker;
+//------------------
+
+
+Sedan importerar du DeadlinePicker in i din AddTodo.js (eller en annan komponent) där du vill att kalendern ska visas.
+
+Sammanfattning:
+
+1. npm install (på din dator) uppdaterar package.json.
+2. podman-compose up (med npm install i command) installerar det i containern.
+3. import (i din React-kod) gör komponenten tillgänglig.
