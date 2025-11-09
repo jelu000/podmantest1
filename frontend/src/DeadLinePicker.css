@@ -1,0 +1,31 @@
+/*React-Day Picker*/
+/* --DayPicker-Accent-Color: Den primära färgen för knappar och val */
+/* --DayPicker-Base-Color: Textfärg för icke-valda dagar */
+
+/* Sätter en mörk färgskala */
+:root {
+  /* Huvudfärgen för valda dagar (Välj en accentfärg) */
+  --rdp-accent-color: #555555; 
+  
+  /* Bakgrundsfärg för den valda dagen */
+  --rdp-background-color: #333333; 
+
+  /* Textfärg för allmän text och dagar */
+  --rdp-color: #dddddd; 
+  
+  /* Bakgrund för hela kalendern */
+  --rdp-cell-bg-color: #1a1a1a; 
+  
+  /* Färg för datum i andra månader (tonas ner) */
+  --rdp-day-unselected-color: #888888; 
+
+  /* Färg för månadstiteln och veckodagar */
+  --rdp-caption-color: #ffffff;
+}
+
+/* Du kan också behöva justera bakgrunden för hela kalendern */
+.rdp {
+  background-color: var(--rdp-cell-bg-color); 
+  border: 1px solid #444; /* Lägg till en ram för att definiera kalendern */
+  border-radius: 8px;
+}

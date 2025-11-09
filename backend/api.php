@@ -57,7 +57,7 @@ try {
                $data = json_decode(file_get_contents("php://input"), true);
                $title = $data['todotext'];
                addTodo($dsn, $user, $pass, $options, $title);
-               echo $title;
+               //echo $title;
            }      
      } 
      
@@ -71,7 +71,7 @@ try {
      
      
      // Om ingen giltig åtgärd angavs
-     echo json_encode(['success' => false, 'message' => 'Ogiltig eller saknad åtgärd.']);
+     //echo json_encode(['success' => false, 'message' => 'Ogiltig eller saknad åtgärd.']);
      
 } catch (\PDOException $e) {
      // Hantera fel vid databasanslutning eller SQL-fråga

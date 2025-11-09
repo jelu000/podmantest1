@@ -5,9 +5,14 @@ services:
   frontend:
     #image: node:20
     image: docker.io/library/node:20
+
+    # ...
+    working_dir: /app
     volumes:
-      #- ./frontend:/app
-      - ./frontend/app:/app  # Mappar 'app' mappen till '/app' i containern
+      
+      - ./frontend:/app
+      #gammal under mapp
+      #- ./frontend/app:/app  # Mappar 'app' mappen till '/app' i containern
       #- ./frontend:/app  # Mappa mappen som innehåller package.json direkt till /app
     
     #command: npm start #run dev
