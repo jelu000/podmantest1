@@ -139,3 +139,33 @@ Används när du har gjort små kodändringar som Podman missar.
 
 Bash
 podman-compose restart frontend
+
+
+
+---------------------------------------------
+
+# /podmantest1/.gitignore
+
+# -------------------------
+# 1. NODE / REACT (Frontend)
+# -------------------------
+# Huvudmapp för beroenden
+/frontend/node_modules
+
+# Byggresultat
+/frontend/dist 
+/frontend/build 
+.vite/ # Vite cache
+
+# Loggar och cache
+npm-debug.log*
+yarn-error.log*
+.eslintcache
+
+# -------------------------
+# 2. PHP / SERVER (Backend)
+# -------------------------
+# PHP Cache
+*.log
+/backend/cache/
+vendor/ # Om du använder Composer
